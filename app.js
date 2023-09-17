@@ -1,61 +1,70 @@
-const express = require("express");
-const app = express();
-const port = process.env.PORT || 3001;
 
-app.get("/", (req, res) => res.type('html').send(html));
 
-const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+let express = require("express");
+let mysql = require("mysql2");
+var cors = require("cors");
+let app = express();
+app.use(express.json());
+app.use(cors());
 
-server.keepAliveTimeout = 120 * 1000;
-server.headersTimeout = 120 * 1000;
+let connection = mysql.createConnection({
+  host: "bopd1xmxvjihwyvgfhhv-mysql.services.clever-cloud.com",
+  user: "uyengyl9t2qg7dix",
+  password: "zzZPwwhUpJQjaOvYWuEX",
+  database: "bopd1xmxvjihwyvgfhhv",
+});
 
-const html = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Hello from Render!</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          disableForReducedMotion: true
-        });
-      }, 500);
-    </script>
-    <style>
-      @import url("https://p.typekit.net/p.css?s=1&k=vnd5zic&ht=tk&f=39475.39476.39477.39478.39479.39480.39481.39482&a=18673890&app=typekit&e=css");
-      @font-face {
-        font-family: "neo-sans";
-        src: url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
-        font-style: normal;
-        font-weight: 700;
+connection.connect(function (err) {
+  if (err) {
+    return console.error("error: " + err.message);
+  }
+  //   console.log(res);
+  console.log("Connected to the MySQL server.");
+});
+
+app.get("/users", function (req, res) {
+  connection.query("select * from users", function (err, result, fields) {
+    console.log(err);
+    console.log(result);
+    console.log(fields);
+    res.send(result);
+  });
+});
+
+app.get("/users/:id", (req, res) => {
+  const elem = req.params;
+  connection.query("select * from users", function (err, result, fields) {
+    console.log(result);
+    for (let i = 0; i < result.length; i++) {
+      if (elem.id == result[i].id) {
+        res.send(result[i]);
       }
-      html {
-        font-family: neo-sans;
-        font-weight: 700;
-        font-size: calc(62rem / 16);
-      }
-      body {
-        background: white;
-      }
-      section {
-        border-radius: 1em;
-        padding: 1em;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-  </head>
-  <body>
-    <section>
-      Hello from Render!
-    </section>
-  </body>
-</html>
-`
+    }
+  });
+});
+
+app.delete("/users/:id", (req, res) => {
+  const elem = req.params.id;
+
+  connection.query(
+    `DELETE FROM users WHERE id=${elem}`,
+    function (err, result, fields) {
+      console.log(result);
+      res.send(result);
+    }
+  );
+});
+
+app.post("/users/", (req, res) => {
+  let obj = req.body;
+  console.log(obj);
+  connection.query(
+    `INSERT INTO users (id, ad, soyad, password, address)
+    VALUES ("${obj.id}", "${obj.ad}", "${obj.soyad}", "${obj.password}", "${obj.address}")`,
+    function (err, result, fields) {
+      res.send(result);
+    }
+  );
+});
+
+app.listen(3100);
