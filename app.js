@@ -1,5 +1,3 @@
-
-
 let express = require("express");
 let mysql = require("mysql2");
 var cors = require("cors");
@@ -8,10 +6,10 @@ app.use(express.json());
 app.use(cors());
 
 let connection = mysql.createConnection({
-  host: "bopd1xmxvjihwyvgfhhv-mysql.services.clever-cloud.com",
-  user: "uyengyl9t2qg7dix",
-  password: "zzZPwwhUpJQjaOvYWuEX",
-  database: "bopd1xmxvjihwyvgfhhv",
+  host: "bqav9dyn3cveokc3dv81-mysql.services.clever-cloud.com",
+  user: "umqjdbkyemylrjdo",
+  password: "MNZEIXg7cV3vBjwhu9nD",
+  database: "bqav9dyn3cveokc3dv81",
 });
 
 connection.connect(function (err) {
@@ -67,4 +65,4 @@ app.post("/users/", (req, res) => {
   );
 });
 
-app.listen(3100);
+app.listen(process.env.PORT || 3000);
